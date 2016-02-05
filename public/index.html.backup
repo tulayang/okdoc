@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Menual</title>
+
+    <link type="text/css" rel="stylesheet" href="css/base.css"/>
+    <link type="text/css" rel="stylesheet" href="css/font-awesome/css/font-awesome.css"/>
+    <link type="text/css" rel="stylesheet" href="css/codemirror.css"/>
+    <link type="text/css" rel="stylesheet" href="css/highlight/xcode.css"/>
+
+    <script src="js/codemirror/lib/codemirror.js"></script>
+    <script src="js/codemirror/mode/markdown/markdown.js"></script>
+    <script src="js/highlight.min.js"></script>
+    <script src="js/marked.min.js"></script>
+</head>
+<body>
+
+<div id="container">
+    <nav id="gmenu" class="fixer">
+        <a class="btn edit" href="#"><i class="fa fa-pencil-square-o"></i></a>
+        <a class="btn goto" href="#"><i class="fa fa-th"></i></a>
+        <a class="btn flush" href="/${username}"><i class="fa fa-user"></i></a>
+        <a class="btn logout" href="/logout"><i class="fa fa-sign-out"></i></a>
+    </nav>
+    <article id="article"></article>
+    <aside id="article-archor" class="fixer"></aside>
+</div>
+
+<div id="writer" class="fixer none">
+    <menu>
+        <a class="btn to-editor"><i class="fa fa-arrows-alt"></i></a>
+        <a class="btn to-previewer"><i class="fa fa-eye"></i></a>
+        <a class="btn update"><i class="fa fa-floppy-o"></i></a>
+        <a class="btn close"><i class="fa fa-times"></i></a>
+    </menu>
+    <div class="layer r-middle editor"><textarea style="display: none;"></textarea></div>
+    <div class="layer l-middle previewer"><article></article></div>
+</div>
+
+<nav id="gnav" class="fixer none">
+    <menu class="fixer">
+        <a class="btn edit" href="#"><i class="fa fa-pencil-square-o"></i></a>
+        <a class="btn close"><i class="fa fa-times"></i></a>
+    </menu>
+    <div class="content"></div>
+</nav>
+
+<script type="text/javascript">
+var textArticle = `
+## 函数
+
+> 在大多数编程语言中称为方法或者函数，在 Nim 语言中叫做过程。函数声明由一个标识符、0 或者多个参数、一个返回值类型和一个块代码组成。声明的参数列表使用逗号（\`,\`）或者分号（\`;\`）间隔：
+>
+\`\`\`nim
+# 只使用逗号
+proc foo(a, b: int, c, d: bool): int
+>
+# 使用分号
+proc foo(a, b: int; c, d: bool): int
+>
+# 失败：a 没有定义类型
+proc foo(a; b: int; c, d: bool): int
+\`\`\`
+
+## aa
+
+> 声明函数时可以使用默认值，当调用者没有提供实参时使用该默认值：
+>
+\`\`\`nim
+proc foo(a: int, b: int = 47): int
+\`\`\`
+
+<br />
+
+> 通过类型修饰符 \`var\`，参数可以是可变的并且函数可以修改该参数值：
+>
+\`\`\`nim
+proc foo(inp: int, outp: var int) =
+    outp = inp + 47
+\`\`\`
+
+<br />
+
+> 如果函数没有主体，它就是个前置声明。如果函数返回值，函数主体会隐式地声明一个名为 \`result\` 的变量，用于表示返回值。函数可以被重载。重载解析算法决定了如何挑选最匹配的函数。例子：
+>
+\`\`\`nim
+proc toLower(c : char) : char =      # toLower for characters
+    if c in {'A'..'Z'}:
+        result = chr(ord(c) + (ord('a') - ord('A')))
+    else:
+        result = c
+>
+proc toLower(s : string) : string =  # toLower for strings
+    result = newString(len(s))
+    for i in 0..len(s) - 1:
+        result[i] = toLower(s[i])    # calls toLower for characters; 不会递归！ 
+\`\`\`
+
+<br />
+
++ a
++ b
+
+aaa
+
+: *a*
+: _b_  
+
+1. a 
+2. b
+`;
+
+
+var textArticle2 = `
+
+## Types
+
+### :Process
+\`\`\`nim
+Process       = ref ProcessObj      ## 表述一个操作系统进程
+\`\`\`
+
+### :ProcessOption
+\`\`\`nim
+ProcessOption = enum                ## 传递给 startProcess 的配置
+    poEchoCmd,                      ## echo the command before execution
+    poUsePath,                      ## Asks system to search for executable using PATH 
+                                    ## environment variable. On Windows, this is the default.
+    poEvalCommand,                  ## Pass \`command\` directly to the shell, without quoting.
+                                    ## Use it only if \`command\` comes from trused source.
+    poStdErrToStdOut,               ## merge stdout and stderr to the stdout stream
+    poParentStreams                 ## use the parent's streams
+\`\`\`
+
+## Procs
+
+### :inputHandle
+\`\`\`nim
+proc inputHandle(p: Process) : FileHandle {.gcsafe, extern: "nosp$1", tags: [], raises: [].}
+     ## 返回进程的输入文件表示，用来写入。警告：返回的 TFileHandle 不应手动关闭，因为当进程关闭时会跟随关闭。
+\`\`\`     
+
+### :outputHandle
+\`\`\`
+proc outputHandle(p: Process): FileHandle {.gcsafe, extern: "nosp$1", tags: [], raises: [].}
+     ## 返回进程的输出文件表示，用来读取。警告：返回的 TFileHandle 不应手动关闭，因为当进程关闭时会跟随关闭。
+
+\`\`\`
+
+### :errorHandle
+\`\`\`
+proc errorHandle(p: Process) : FileHandle {.gcsafe, extern: "nosp$1", tags: [], raises: [].}
+     ## 返回进程的错误文件表示，用来读取。警告：返回的 TFileHandle 不应手动关闭，因为当进程关闭时会跟随关闭。
+\`\`\`
+
+### :inputStream
+\`\`\`
+proc inputStream(p: Process) : Stream {.gcsafe, extern: "nosp$1", tags: [], raises: [].}
+     ## 返回进程的可写流。警告：返回的 PStream 不应手动关闭，因为当进程关闭时会跟随关闭。
+\`\`\`
+
+### :outputStream
+\`\`\`
+proc outputStream(p: Process): Stream {.gcsafe, extern: "nosp$1", tags: [], raises: [].}
+     ## 返回进程的可读流。警告：返回的 PStream 不应手动关闭，因为当进程关闭时会跟随关闭。
+\`\`\`
+
+### :errorStream
+\`\`\`
+proc errorStream(p: Process) : Stream {.gcsafe, extern: "nosp$1", tags: [], raises: [].}
+     ## 返回进程的错误流。警告：返回的 PStream 不应手动关闭，因为当进程关闭时会跟随关闭。
+\`\`\`
+`;
+
+var textNavtxt = `
+* [**parseopt** The parseopt module implements a command line option parser. Deprecated since version 0.9.3: Use the parseopt2 module instead.](a.com)
+* [**parseopt** The parseopt module implements a command line option parser. Deprecated since version 0.9.3: Use the parseopt2 module instead.](a.com)
+* [**parseopt** The parseopt module implements a command line option parser. Deprecated since version 0.9.3: Use the parseopt2 module instead.](a.com)
+`;
+
+(function (CodeMirror, hljs, marked) {
+function hasClass(el, name) {
+    return new RegExp('(?:^' + name + '$)' +
+                      '|(?:\\s+' + name + '$)' + 
+                      '|(?:^' + name + '\\s+)' + 
+                      '|(?:\\s+' + name + '\\s+)').test(el.className);
+}
+
+function removeClass(el, name) {
+    var reg = new RegExp('(?:^' + name + '$)' +
+                         '|(?:\\s+' + name + '$)' + 
+                         '|(?:^' + name + '\\s+)' + 
+                         '|(?:\\s+' + name + '\\s+)');
+    el.className = el.className.replace(reg, function (text) {
+        return ' ';
+    }).replace(/\\s{2,}/, ' ').trim();
+}
+
+function addClass(el, name) {
+    if (!hasClass(el, name)) {
+        el.className = (el.className + ' ' + name).trim();
+    }
+}
+
+function click(el, f) {
+    document.addEventListener('click', function (e) {
+        if (el.contains(e.target)) {
+            f(e);
+        }
+    }, false);
+}
+
+function keydown(condf, f) {
+    document.addEventListener('keydown', function (e) {
+        if (condf(e)) {
+            f(e);
+        }
+    }, false);
+}
+
+function keyup(condf, f) {
+    document.addEventListener('keyup', function (e) {
+        if (condf(e)) {
+            f(e);
+        }
+    }, false);
+}
+
+function isKeyUpdate(e) {
+    return e.ctrlKey && e.keyCode === 83
+}
+
+function isKeyCancel(e) {
+    return e.keyCode === 27;
+}
+
+function cancelLeftClick() {
+    document.addEventListener('click', function (e) {
+        if (e.button !== 0) {
+            e.preventDefault();
+        }
+    }, false);
+}
+
+function listhead(n) {
+    var result = "";
+    for (var i = 1; i <= n; i++) {
+        result += '<ul>';
+    }
+    return result;
+}
+
+function listfoot(n) {
+    var result = "";
+    for (var i = 1; i <= n; i++) {
+        result += '</ul>';
+    }
+    return result;
+}
+
+function listitem(headId, text) {
+    return  '<li class="linker">' + 
+                '<i class="fa fa-plus"></i>' +
+                '<a class="text-ellipsis" href="#user-content-' + headId + '">' + text + '</a>' +
+            '</li>';
+}
+
+var RendererMode = Object.create(null);
+RendererMode.rmArchor = 0x0001;
+RendererMode.rmContent = 0x0002;
+RendererMode.rmNavlist = 0x0004;
+
+function Renderer(path, articleIndexes) {
+    var R = this;
+    R.path = path;
+    R.navArticleIndexes = articleIndexes;
+    R.navArticleText = "";
+    R.mode = RendererMode.rmArchor | RendererMode.rmContent;
+    R.lastlevel = -1;
+    R.headId = -1;
+    R.archor = "";
+    R.renderer = new marked.Renderer();
+    R.renderer.heading = R.heading();
+    R.renderer.listitem = R.listitem();
+    R.renderer.link = R.link();
+    R.renderer.strong = R.strong();
+    marked.setOptions({
+        renderer: R.renderer,
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: false,
+        highlight: function (code, lang) {
+            if (typeof lang === 'string' && lang.length > 0) {
+                try {
+                    var obj = hljs.highlight(lang, code, true, false);
+                    return obj.value;
+                } catch (e) {
+                    return code;
+                }
+            }
+            return hljs.highlightAuto(code).value;
+        }
+    });
+}
+
+Renderer.prototype.heading = function () {
+    var R = this;
+    return function (text, level) { 
+        if (R.mode & RendererMode.rmContent) {
+            if (R.mode & RendererMode.rmArchor) {
+                ++R.headId;
+                var headClass = "";
+                if (/^:\s*/.test(text)) {
+                    text = RegExp.rightContext;
+                    headClass = ' class="archor"';
+                }
+                if (level > 1) {
+                    if (R.lastlevel < 0) {
+                        R.archor += listhead(level - 1) + listitem(R.headId, text);
+                        R.lastlevel = level;
+                    } else if (R.lastlevel > level) {
+                        R.archor += listfoot(R.lastlevel - level) + listitem(R.headId, text);
+                        R.lastlevel = level;
+                    } else if (R.lastlevel === level) {
+                        R.archor += listitem(R.headId, text);
+                    } else {
+                        R.archor += listhead(level - R.lastlevel) + listitem(R.headId, text);
+                        R.lastlevel = level;
+                    }
+                }     
+                return  '<h' + level + headClass + '>' +
+                            '<a id="user-content-' + R.headId + '" class="anchor" href="#user-content-' + R.headId + '">' +
+                                '<span class="header-link"></span>' + 
+                            '</a>' +
+                            text +
+                        '</h' + level + '>';
+            } else {
+                return  '<h' + level + '>' +
+                        text + 
+                        '</h' + level + '>';
+            }
+        } else {
+            throw new Error("renderer need mode: rmContent");
+        }
+    };
+};
+
+Renderer.prototype.listitem = function () {
+    var R = this;
+    return function (text) {
+        if (R.mode & RendererMode.rmNavlist) {
+            return '<li class="linker multi"><i class="fa fa-plus"></i>' + text + '</li>';
+        } else {
+            return '<li>' + text + '</li>';
+        }
+    };
+};
+
+Renderer.prototype.strong = function () {
+    var R = this;
+    return function (text) {
+        if (R.mode & RendererMode.rmNavlist) {
+            R.navArticleText = text;
+            return '<strong>' + text + '</strong>';
+        } else {
+            return '<strong>' + text + '</strong>';
+        }
+    };
+};
+
+Renderer.prototype.link = function () {
+    var R = this;
+    return function (href, title, text) {
+        if (R.mode & RendererMode.rmNavlist) {
+            var index = -1;
+            if (R.navArticleText in R.navArticleIndexes) {
+                index = R.navArticleIndexes[R.navArticleText];
+            }
+            return '<a href="/manuals/articles/' + index + '" title="' + title + '">' + text + '</a>';
+        } else {
+            return '<a href="' + href + '" title="' + title + '">' + text + '</a>';
+        }
+    };
+};
+
+Renderer.prototype.setMode = function (mode) {
+    this.mode = mode;
+};
+
+Renderer.prototype.html = function (text) {
+    var result = "";
+    var R = this;
+    if (R.mode & RendererMode.rmContent) {
+        if (R.mode & RendererMode.rmArchor) {
+            var headId = R.headId;
+            var archor = R.archor;
+            var level = R.lastlevel;
+            R.archor = ""; 
+            R.lastlevel = -1;
+            R.headId = -1;      // 重新计算 head 标题的序号
+            marked(text, function (err, content) {
+                if (!err) {
+                    R.archor += listfoot(R.lastlevel - 1);
+                    result = content; 
+                } else {
+                    R.archor = "";
+                    R.headId = headId;
+                    R.archor = archor;
+                    R.lastlevel = level;
+                    result = text;
+                }
+            }); 
+            return result;
+        } else if (R.mode & RendererMode.rmNavlist) {
+            marked(text, function (err, content) {
+                result = err ? text : content; 
+            }); 
+            return result;
+        } else {
+            marked(text, function (err, content) {
+                result = err ? text : content; 
+            }); 
+            return result;
+        }
+    } else {
+        throw new Error("renderer need mode: rmContent");
+    }
+};
+
+// 需要服务端渲染的数据 ////////////////////////////////////
+const PATH = "manuals";
+const ArticleIndex = {
+    "parseopt": 2,
+    "c": 1,
+    "b": 0
+};
+////////////////////////////////////////////////////////
+
+var EditMode = Object.create(null);
+EditMode.emNone = 0;
+EditMode.emContainer = 1;
+EditMode.emGnav = 2;
+EditMode.emArticleEdit = 3;
+EditMode.emGnavEdit = 4;
+
+var UpdateState = Object.create(null);
+UpdateState.usReady = 1;
+UpdateState.usBusy = 2;
+
+var elContainer = document.querySelector("#container");
+var elArchor = document.querySelector("#article-archor");
+var elGnav = document.querySelector("#gnav");
+var elGnavContent = elGnav.querySelector(".content");
+var elGnavEdit = elGnav.querySelector(".edit");
+var elGnavClose = elGnav.querySelector(".close");
+var elArticle = document.querySelector("#article");
+var elGoGnav = document.querySelector("#gmenu .goto");
+var elArticleEdit = document.querySelector("#gmenu .edit");
+var elWriter = document.querySelector("#writer");
+var elToEditor = elWriter.querySelector(".to-editor");
+var elToPreviewer = elWriter.querySelector(".to-previewer");
+var elEditor = elWriter.querySelector(".editor");
+var elPreviewer = elWriter.querySelector(".previewer");
+var elPreviewerContent = elPreviewer.querySelector("article");
+var elUpdate = elWriter.querySelector(".update");
+var elUpdateIco = elUpdate.querySelector('i');
+var elWriterClose = elWriter.querySelector(".close");
+var codemirror = CodeMirror.fromTextArea(elEditor.querySelector("textarea"), { 
+    lineWrapping: true,
+    lineNumbers: true 
+});
+var req = new XMLHttpRequest();
+var renderer = new Renderer(PATH, ArticleIndex);
+var articleContent = "";
+var gnavContent = "";
+var articleUrl = "";
+var gnavUrl = "";
+var editMode;
+var updateState;
+
+function get(url, callback) {    
+    req.onload = function () {
+        callback(req.responseText);
+    };
+    req.open('GET', url, true);
+    req.send(null);
+}
+
+function post(url, data, callback) {
+    req.onload = function () {
+        callback(req.responseText);
+    };
+    req.open('POST', url, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.send(JSON.stringify(data));
+}
+
+function show(el) {
+    removeClass(el, 'none');
+}
+
+function hide(el) {
+    addClass(el, 'none');
+}
+
+function isUpdateState(state) {
+    return updateState === state;
+}
+
+function setUpdateState(state) {
+    updateState = state;
+}
+
+function isEditMode(mode) {
+    return editMode === mode;
+}
+
+function setEditMode(mode) {
+    editMode = mode;
+}
+
+function renderArticle(text) {
+    articleContent = text;
+    renderer.setMode(RendererMode.rmArchor | RendererMode.rmContent);
+    elArticle.innerHTML = renderer.html(text);
+    elArchor.innerHTML = renderer.archor;
+}
+
+function renderArticlePriviewer(text) {
+    renderer.setMode(RendererMode.rmContent);
+    elPreviewerContent.innerHTML = renderer.html(text);
+}
+
+function renderGnavPriviewer(text) {
+    renderer.setMode(RendererMode.rmContent | RendererMode.rmNavlist);
+    elPreviewerContent.innerHTML = renderer.html(text);
+}
+
+function renderGnav(text) {
+    gnavContent = text;
+    renderer.setMode(RendererMode.rmNavlist | RendererMode.rmContent);
+    elGnavContent.innerHTML = renderer.html(text);
+}
+
+renderGnav(textNavtxt);
+renderArticle(textArticle2);
+setEditMode(EditMode.emContainer);
+setUpdateState(UpdateState.usReady);
+cancelLeftClick();
+codemirror.on('change', function (codemirror, change) {
+    if (isEditMode(EditMode.emArticleEdit)) {
+        renderArticlePriviewer(codemirror.getDoc().getValue());
+    }
+    if (isEditMode(EditMode.emGnavEdit)) {
+        renderGnavPriviewer(codemirror.getDoc().getValue());
+    }
+});
+click(elGoGnav, function (e) {
+    setEditMode(EditMode.emGnav);
+    show(elGnav);
+    hide(elContainer);
+    addClass(elWriter, 'on-gnav');
+});
+click(elGnavClose, function (e) {
+    setEditMode(EditMode.emGnav);
+    show(elContainer);
+    hide(elGnav);
+    removeClass(elWriter, 'on-gnav');
+});
+click(elGnavEdit, function (e) {
+    setEditMode(EditMode.emGnavEdit);
+    show(elWriter);
+    hide(elGnav);
+    codemirror.getDoc().setValue(gnavContent);
+});
+click(elArticleEdit, function (e) {
+    setEditMode(EditMode.emArticleEdit);
+    show(elWriter);
+    hide(elContainer);
+    codemirror.getDoc().setValue(articleContent);
+});
+click(elWriterClose, function (e) {
+    if (isEditMode(EditMode.emArticleEdit)) {
+        setEditMode(EditMode.emContainer);
+        show(elContainer);
+        hide(elWriter);
+    }
+    if (isEditMode(EditMode.emGnavEdit)) {
+        setEditMode(EditMode.emGnav);
+        show(elGnav);
+        hide(elWriter);
+    }
+    removeClass(elEditor, 'r-middle');
+    removeClass(elEditor, 'r-zero');
+    removeClass(elPreviewer, 'l-middle');
+    removeClass(elPreviewer, 'l-zero');
+    addClass(elEditor, 'r-middle');
+    addClass(elPreviewer, 'l-middle');
+});
+click(elToEditor, function (e) {
+    if (hasClass(elEditor, 'r-middle')) {
+        removeClass(elEditor, 'r-middle');
+        removeClass(elPreviewer, 'l-middle');
+        addClass(elPreviewer, 'l-zero');
+    } else if (hasClass(elEditor, 'r-zero')) {
+        removeClass(elEditor, 'r-zero');
+        addClass(elPreviewer, 'l-middle');
+        addClass(elEditor,  'r-middle');
+    }
+});
+click(elToPreviewer, function (e) {
+    if (hasClass(elPreviewer, 'l-middle')) {
+        removeClass(elEditor, 'r-middle');
+        removeClass(elPreviewer, 'l-middle');
+        addClass(elEditor, 'r-zero');
+    } else if (hasClass(elPreviewer, 'l-zero')) {
+        removeClass(elPreviewer, 'l-zero');
+        addClass(elEditor, 'r-middle');
+        addClass(elPreviewer, 'l-middle');
+    }
+});
+click(elUpdate, function (e) {
+    if (isEditMode(EditMode.emArticleEdit) && isUpdateState(UpdateState.usReady)) {
+        removeClass(elUpdateIco, 'fa-floppy-o');
+        addClass(elUpdateIco, 'fa-refresh');
+        addClass(elUpdateIco, 'fa-spin');
+        setUpdateState(UpdateState.usBusy);
+        var text = codemirror.getDoc().getValue();
+        post(articleUrl, {
+            content: text
+        }, function (data) {
+            renderArticle(text);
+            removeClass(elUpdateIco, 'fa-refresh');
+            removeClass(elUpdateIco, 'fa-spin');
+            addClass(elUpdateIco, 'fa-floppy-o');
+            setUpdateState(UpdateState.usReady);
+        });
+    } 
+    if (isEditMode(EditMode.emGnavEdit) && isUpdateState(UpdateState.usReady)) {
+        removeClass(elUpdateIco, 'fa-floppy-o');
+        addClass(elUpdateIco, 'fa-refresh');
+        addClass(elUpdateIco, 'fa-spin');
+        setUpdateState(UpdateState.usBusy);
+        var text = codemirror.getDoc().getValue();
+        post(gnavUrl, {
+            content: text
+        }, function (data) {
+            renderGnav(text);
+            removeClass(elUpdateIco, 'fa-refresh');
+            removeClass(elUpdateIco, 'fa-spin');
+            addClass(elUpdateIco, 'fa-floppy-o');
+            setUpdateState(UpdateState.usReady);
+        });
+    }
+});
+keydown(function (e) {return isKeyUpdate(e);}, function (e) { 
+    e.preventDefault();
+}); 
+keyup(function (e) {return isKeyUpdate(e);}, function (e) {
+    if (isEditMode(EditMode.emArticleEdit) && isUpdateState(UpdateState.usReady)) {
+        removeClass(elUpdateIco, 'fa-floppy-o');
+        addClass(elUpdateIco, 'fa-refresh');
+        addClass(elUpdateIco, 'fa-spin');
+        setUpdateState(UpdateState.usBusy);
+        var text = codemirror.getDoc().getValue();
+        post(articleUrl, {
+            content: text
+        }, function (data) {
+            renderArticle(text);
+            removeClass(elUpdateIco, 'fa-refresh');
+            removeClass(elUpdateIco, 'fa-spin');
+            addClass(elUpdateIco, 'fa-floppy-o');
+            setUpdateState(UpdateState.usReady);
+        });
+    } 
+    if (isEditMode(EditMode.emGnavEdit) && isUpdateState(UpdateState.usReady)) {
+        removeClass(elUpdateIco, 'fa-floppy-o');
+        addClass(elUpdateIco, 'fa-refresh');
+        addClass(elUpdateIco, 'fa-spin');
+        setUpdateState(UpdateState.usBusy);
+        var text = codemirror.getDoc().getValue();
+        post(gnavUrl, {
+            content: text
+        }, function (data) {
+            renderGnav(text);
+            removeClass(elUpdateIco, 'fa-refresh');
+            removeClass(elUpdateIco, 'fa-spin');
+            addClass(elUpdateIco, 'fa-floppy-o');
+            setUpdateState(UpdateState.usReady);
+        });
+    }
+});
+keyup(function (e) {return isKeyCancel(e);}, function (e) {
+    if (isEditMode(EditMode.emArticleEdit)) {
+        setEditMode(EditMode.emContainer);
+        show(elContainer);
+        hide(elWriter);
+        removeClass(elEditor, 'r-middle');
+        removeClass(elEditor, 'r-zero');
+        removeClass(elPreviewer, 'l-middle');
+        removeClass(elPreviewer, 'l-zero');
+        addClass(elEditor, 'r-middle');
+        addClass(elPreviewer, 'l-middle');
+    }
+    if (isEditMode(EditMode.emGnav)) {
+        setEditMode(EditMode.emContainer);
+        show(elContainer); 
+        hide(elGnav);
+        removeClass(elWriter, 'on-gnav');
+    }
+    if (isEditMode(EditMode.emGnavEdit)) {
+        setEditMode(EditMode.emGnav);
+        show(elGnav);
+        hide(elWriter);
+        removeClass(elEditor, 'r-middle');
+        removeClass(elEditor, 'r-zero');
+        removeClass(elPreviewer, 'l-middle');
+        removeClass(elPreviewer, 'l-zero');
+        addClass(elEditor, 'r-middle');
+        addClass(elPreviewer, 'l-middle');
+    }
+});
+}(CodeMirror, hljs, marked));
+</script>
+</body>
+</html>
+

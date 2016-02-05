@@ -1,0 +1,79 @@
+[
+  {
+    "name": "fileExtname", 
+    "type": "skConst", 
+    "code": "fileExtname* = \".md\""
+  }, 
+  {
+    "name": "DataCollection", 
+    "type": "skType", 
+    "description": "File data object.", 
+    "code": "DataCollection* = ref object\u000A  components: seq[DataComponent]\u000A  indexes: Table[string, int]\u000A  dirname: string\u000A  basename: string\u000A"
+  }, 
+  {
+    "name": "nodes", 
+    "type": "skIterator", 
+    "code": "iterator nodes*(dirname: string; filter: proc (path: string): bool = nil): PathNode"
+  }, 
+  {
+    "name": "newDataCollection", 
+    "type": "skProc", 
+    "code": "proc newDataCollection*(dirname: string): DataCollection"
+  }, 
+  {
+    "name": "mapData", 
+    "type": "skProc", 
+    "description": "Open a directory and then initialize it to a new <cite>DataCollection</cite>.", 
+    "code": "proc mapData*(c: DataCollection)"
+  }, 
+  {
+    "name": "reMapData", 
+    "type": "skProc", 
+    "code": "proc reMapData*(c: DataCollection)"
+  }, 
+  {
+    "name": "hasIndex", 
+    "type": "skTemplate", 
+    "code": "template hasIndex*(c: DataCollection; path: string): bool"
+  }, 
+  {
+    "name": "getIndex", 
+    "type": "skTemplate", 
+    "code": "template getIndex*(c: DataCollection; path: string): int"
+  }, 
+  {
+    "name": "isDataFile", 
+    "type": "skTemplate", 
+    "code": "template isDataFile*(c: DataCollection; index: int): bool"
+  }, 
+  {
+    "name": "isDataDir", 
+    "type": "skTemplate", 
+    "code": "template isDataDir*(c: DataCollection; index: int): bool"
+  }, 
+  {
+    "name": "getDataFile", 
+    "type": "skTemplate", 
+    "code": "template getDataFile*(c: DataCollection; index: int): DataFile"
+  }, 
+  {
+    "name": "getDataLink", 
+    "type": "skTemplate", 
+    "code": "template getDataLink*(c: DataCollection; index: int): DataLink"
+  }, 
+  {
+    "name": "getHomeList", 
+    "type": "skProc", 
+    "code": "proc getHomeList*(c: DataCollection): seq[tuple[name, url: string]]"
+  }, 
+  {
+    "name": "update", 
+    "type": "skProc", 
+    "code": "proc update*(c: DataCollection; index: int; content: string)"
+  }, 
+  {
+    "name": "mklink", 
+    "type": "skProc", 
+    "code": "proc mklink*(c: DataCollection)"
+  }
+]

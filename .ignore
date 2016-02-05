@@ -1,0 +1,5 @@
+bin
+
+src/okdocd.nim
+install.sh
+startup.sh
