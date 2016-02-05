@@ -1,45 +1,13 @@
-.
+# okdoc
 
-1. GNU C Library
+okdoc 是一个开源的文档管理器，包括一个后端文档服务器（Nim 语言编写）、一个前端 markdown 编辑器（JavaScript 语言编写）、一个 html 渲染程序。okdoc 收录了许多英文文档的中文译文，包括 [GNU C Library]()、[Nim Manual]()、...。
 
-   完成 60% 。暂停
+现在，okdoc 运行在云服务器上，你可以通过 http://101.200.163.149 访问。--- 很遗憾没有域名，中国特色的备案制度，hehe。
 
-2. Mysql
+### 部署在本地
 
-   开始 ...... ===>
-
-3. Nginx
-
-   完成 10% 。
-
-4. Docker
-
-   完成 10% 。
-
-5. OpenSSL
-
-6. MongoDB ?
-
-7. Redis ?
-
-8. GNU C Compiler
-
-9. Nim
-
-   完成 100% 。
-
-11. Nim Library
-
-    完成 30% 。
-
-12. Nim Compiler
-
-13. Linux Utility
-
-14. Shell
-
-15. Git
-
-16. Makefile
-
-17. Autoconf
+```sh
+$ git clone https://github.com/tulayang/okdoc.git
+$ cd okdoc
+$ nim c -r:release src/okdoc.nim
+```
