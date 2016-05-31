@@ -11,5 +11,6 @@
 ```sh
 $ git clone https://github.com/tulayang/okdoc.git
 $ cd okdoc
+$ nimble install
 $ nim c -r:release src/okdoc.nim
 ```
