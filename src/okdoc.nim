@@ -23,13 +23,14 @@ proc normalizePath(s: string): string =
         setLen(result, j)
 
 const 
-    workDir = "/home/king/Nutstore/okdoc"
-    staticDir = joinPath(workDir, "public")
     bindAddr = "127.0.0.1"
     port = 8000
-    docsPath = joinPath(workDir, "docs")
 
 var collection: DocCollection
+
+let workDir = getCurrentDir()
+let staticDir = joinPath(workDir, "public")
+let docsPath  = joinPath(workDir, "docs")
 
 template initialize() =
     collection = newDocCollection(docsPath)
