@@ -51,7 +51,7 @@ routes:
         redirect "/"
 
     get re"^/docs/(.+)$":
-        let url = unixToNativePath(normalizePath(joinPath("/docs/", decodeUrl(request.matches[0]))))
+        let url = unixToNativePath(normalizePath(joinPath("/docs/", decodeUrl(request.matches[0])))).replace("\\","/")
         if hasComponent(collection, url):
             let index = getComponentIndex(collection, url)
             if isDocFile(collection, index):
