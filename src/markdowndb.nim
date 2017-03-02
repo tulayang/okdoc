@@ -150,9 +150,10 @@ proc filter(path: string): bool =
 
 proc convertUrl(rootpath, rootname, path: string): string =
     if len(rootpath) < len(path):
-        joinPath("/", rootname, path[len(rootpath)..high(path)])
+        result = joinPath("/", rootname, path[len(rootpath)..high(path)])
     else:
-        joinPath("/", rootname)
+        result = joinPath("/", rootname)
+    result = result.replace("\\","/")
 
 proc mapDoc*(c: DocCollection) = 
     ## Open a directory and then initialize it to a new `DocCollection`.
