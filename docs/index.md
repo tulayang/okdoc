@@ -1,4 +1,3 @@
-* [**GNU C Compiler**](/docs/GNU C Compiler)
 * [**GNU C Library**](/docs/GNU C Library)
 * [**Posix Library**](/docs/Posix Library)
 * [**OpenSSL**](/docs/OpenSSL)
